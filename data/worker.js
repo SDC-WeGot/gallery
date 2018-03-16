@@ -4,10 +4,9 @@ const rp = require('request-promise')
 const Photos = ('./database/index.js');
 const IDS = require('./weGotData.js');
 const fs = require('fs');
+const API_KEY = require('../config.js');
 
 mongoose.connect('mongodb://localhost/photos');
-
-const API_KEY = 'AIzaSyCjAQ33tNqsfUoF1CV0TDw8GcoHqSf3dgo';
 
 const API_URL = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=';
 
@@ -20,7 +19,7 @@ function isJSONResponse(headers) {
 function getJSONFromAPI(url, key, callback) {
   const seedData = [];
   IDS.forEach((ID) => { // for each ID
-    const FULL_URL = `${API_URL}${ID}&key=${API_KEY}`;
+    const FULL_URL = `${API_URL}${ID}&key=${API_KEY.KEY}`;
 
     rp.get(FULL_URL, (err, response, body) => {
       if (err) {

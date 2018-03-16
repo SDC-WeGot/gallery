@@ -1,74 +1,82 @@
-const data = require('./allData.js');
-const mongoose = require('mongoose');
-const Photos = require('../database/index.js');
-const API_KEY = 'AIzaSyCjAQ33tNqsfUoF1CV0TDw8GcoHqSf3dgo';
+const Promise = require('bluebird');
+const MongoClient = require('mongodb').MongoClient;
+const cluster = require('cluster');
+const seedData = require('./seedData.js'); 
 
-mongoose.connect('mongodb://database/photos', (err) => {
-  if (err) {
-    throw err;
-  } else {
-    console.log('mongoose connected');
-  }
-});
+const numCPUs = require('os').cpus().length;
+const time = new Date().getTime();
+const coreCount = [];
 
-function seedDb() {
-  let count = 0;
-  Photos.isSeeded().then((result) => {
-    if (result === 0) {
-      data.forEach((place) => { // for each ID
-        const entry = {
-          place_id: place.result.place_id,
-          place_name: place.result.name,
-          photos: [],
-          reviews: [],
-        };
-        // push photo details to entry
-        const photos = place.result.photos;
-        const PHOTOS_URL = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=900&photoreference=';
+function seedDB() {
+  MongoClient.connect('mongodb://localhost:27017', (err, client) => {
+    if (err) {console.log(err)}
 
-        for (let i = 0; i < photos.length; i += 1) {
-          const photoRef = photos[i].photo_reference;
-          const photoUrl = `${PHOTOS_URL}${photoRef}&key=${API_KEY}`;
-          const details = {
-            ref: photoRef,
-            url: photoUrl,
-            width: photos[i].width,
-            height: photos[i].height,
-          };
-          entry.photos.push(details);
-        }
+    console.log('mongo connected');
 
-        // push each review to entry
-        const reviews = place.result.reviews;
-
-        for (let j = 0; j < reviews.length; j += 1) {
-          const review = {
-            name: reviews[j].author_name,
-            avatar: reviews[j].profile_photo_url,
-          };
-          entry.reviews.push(review);
-        }
-
-        Photos.insertOne(entry, (err) => {
-          if (err) {
-            console.log(err);
-          } else {
-            count += 1;
-            if (count === 195) {
-              console.log('database successfully seeded');
-              mongoose.disconnect();
-            }
-          }
-        });
-      });
-    } else {
-      console.log('database is already seeded');
-      mongoose.disconnect();
+    let db = client.db('photos');
+    
+    let count = parseInt(10000000 / numCPUs);
+    
+    let core = cluster.worker.id;
+    let counter = 10000000;
+    
+    async function genAndSeed() {
+      i = parseInt(((core * 10000000) / numCPUs)); 
+      j = parseInt((((core - 1) * 10000000) / numCPUs));
+      for(var k = i; k > j; k-= 1000) {
+        let l = seedData.createBulkData(k - 1000);
+        await db.collection('photos').insertMany(l);
+      }
+      
+      console.log(`time: ${(new Date().getTime() - time) / 1000}`);
+      client.close();
+      process.exit();
     }
+    genAndSeed();
   });
 }
 
-seedDb(data);
+function indexDB() {
+  MongoClient.connect('mongodb://localhost:27017', (err, client) => {
+    if(err) {console.log(err);}
+    console('mongo connected to index');
 
+    let db = client.db('photos');
+    async function indexMe() {
+      await db.collection("photos").createIndex({place_id: 1});
+      client.close();
+    }
+    indexMe();
+  });
+}
 
-module.exports = seedDb;
+function workerDone(worker) {
+  return new Promise((resolve, reject) => {
+    worker.on('disconnect', () => {
+      resolve();
+      reject();
+    });
+  });
+}
+
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} running`);
+  let workersDone = [];
+  for (let i = 0; i < numCPUs; i++) {
+    let worker = cluster.fork();
+    workersDone.push(workerDone(worker));
+  }
+
+  Promise.all(workersDone).then(async () => {
+    indexDB();
+  });
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} finised`);
+  })
+  
+} else {
+  seedDB();
+  console.log(`worker ${process.pid} started`);
+}
+
