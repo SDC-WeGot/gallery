@@ -14,9 +14,10 @@ const ReviewSchema = mongoose.Schema({
 
 const photoSchema = mongoose.Schema({
   place_id: {
-    type: String,
+    type: Number,
     unique: true,
   },
+  // place_id: Number,
   place_name: String,
   photos: [PhotosSchema],
   reviews: [ReviewSchema],
@@ -36,7 +37,7 @@ function findAll(callback) {
 
 // findOne will retrieve the photo associated with the given id
 function findOne(id, callback) {
-  console.log('database finding by id:', id)
+  console.log('database finding by id:', id);
   Photos.find({
     place_id: id,
   }, callback);
@@ -46,8 +47,21 @@ function findOne(id, callback) {
 function insertOne(entry, callback) {
   Photos.create(entry, callback);
 }
+// TrialWork
+
+function insertMany(collection) {
+  return Photos.insertMany(collection)
+  // .then(function() {
+  //   console.log('finished inserting');
+  // })
+  // .catch(function(err) {
+  //   console.log(err);
+  // });
+}
+
 
 exports.findOne = findOne;
 exports.findAll = findAll;
 exports.insertOne = insertOne;
 exports.isSeeded = isSeeded;
+exports.insertMany = insertMany;

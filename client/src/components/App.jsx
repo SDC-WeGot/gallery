@@ -31,6 +31,7 @@ export default class App extends React.Component {
 
     axios.get(`/api/restaurants/${id}/gallery`)
       .then((response) => {
+        // console.log(response.data)
         context.setState({
           data: response.data[0],
           siteName: response.data[0].place_name,
