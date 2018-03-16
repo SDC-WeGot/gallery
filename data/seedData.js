@@ -13,8 +13,8 @@ function createOneData(n) {
   const dummyData = {
     place_id: n,
     place_name: null,
-    photo0: null,
-    review0: null,
+    photos: [],
+    reviews: [],
   };
 
   let photoObj = {
@@ -38,7 +38,8 @@ function createOneData(n) {
     photoObj.width = randWidth;
     photoObj.height = randHeight;
     photoObj.url = `https://picsum.photos/${randWidth}/${randHeight}?image=${randomInt()}`;
-    dummyData[`photo${i}`] = photoObj;
+    // dummyData[`photo${i}`] = photoObj;
+    dummyData.photos.push(photoObj);
     photoObj = {};
     photoObj.ref = null;
     photoObj.width = 500;
@@ -47,7 +48,8 @@ function createOneData(n) {
   for (let j = 0; j < 5; j++) {
     reviewObj.name = faker.internet.userName();
     reviewObj.avatar = faker.image.avatar();
-    dummyData[`reviews${j}`] = reviewObj;
+    // dummyData[`reviews${j}`] = reviewObj;
+    dummyData.reviews.push(reviewObj);
     reviewObj = {};
     reviewObj.name = null;
     reviewObj.avatar = null;
