@@ -39,7 +39,6 @@ function seedDB() {
 function indexDB() {
   MongoClient.connect('mongodb://localhost:27017', (err, client) => {
     if(err) {console.log(err);}
-    console('mongo connected to index');
 
     let db = client.db('photos');
     async function indexMe() {
