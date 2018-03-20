@@ -1,6 +1,5 @@
 const faker = require('faker');
 
-
 function randomInt() {
   return Math.floor(Math.random() * Math.floor(1050));
 }
