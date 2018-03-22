@@ -3,7 +3,7 @@ const seedData = require('./pseedData');
 
 const bizSize = 10000000;
 const userSize = 1000000;
-const photoSize = 50000000;
+const photoSize = 100000000;
 
 // const bizSize = 100000;
 // const userSize = 10000;
@@ -144,6 +144,56 @@ const createFK = () => {
     });
 }
 
+const indexPhotosDB = () => {
+  return dbt.none('CREATE INDEX CONCURRENTLY ON photos("id");')
+    .then(() => {
+      console.log(`index photo time: ${(new Date().getTime() - time) / 1000}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    }); 
+}
+
+const indexBusinessesDB = () => {
+  return dbt.none('CREATE INDEX CONCURRENTLY ON businesses("id");')
+    .then(() => {
+      console.log(`index biz time: ${(new Date().getTime() - time) / 1000}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    }); 
+}
+
+const indexUsersDB = () => {
+  return dbt.none('CREATE INDEX CONCURRENTLY ON users ("id");')
+    .then(() => {
+      console.log(`index user time: ${(new Date().getTime() - time) / 1000}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    }); 
+}
+
+const indexPhotosFKUserDB = () => {
+  return dbt.none('CREATE INDEX CONCURRENTLY ON photos("user_id");')
+    .then(() => {
+      console.log(`index photo fk user time: ${(new Date().getTime() - time) / 1000}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    }); 
+}
+
+const indexPhotosFKBizDB = () => {
+  return dbt.none('CREATE INDEX CONCURRENTLY ON photos("business_id");')
+    .then(() => {
+      console.log(`index photo fk biz time: ${(new Date().getTime() - time) / 1000}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    }); 
+}
+
 const createDB = () => {
   db.none('CREATE DATABASE photos')
     .then((data) => {
@@ -156,12 +206,16 @@ const createDB = () => {
       // await createBusinessTB();
       // await createUsersTB();
     })
-    .then(()=> {
-      createFK();
+    .then(async () => {
+      await createFK();
     })
-    // .then(async () => {
-    //   await createUsersTB();
-    // })
+    .then(async () => {
+      await indexUsersDB();
+      await indexBusinessesDB();
+      await indexPhotosDB();
+      await indexPhotosFKBizDB();
+      await indexPhotosFKUserDB();
+    })
     // .then(async () => {
     //   await createPhotosTB();
     // })

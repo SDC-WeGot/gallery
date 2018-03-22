@@ -38,14 +38,14 @@ function createObjPhoto(k) {
   dummyPhoto.photourl = `https://picsum.photos/${randWidth}/${randHeight}?image=${randomInt()}`;
   dummyPhoto.photowidth = randWidth;
   dummyPhoto.photoheight = randHeight;
-  // dummyPhoto.user_id = randomUser();
-  // dummyPhoto.business_id = randomBiz();
-  
+
   dummyPhoto.user_id = randomUser();
+
+
   // dummyPhoto.user_id = 1;
 
-  // if (counter < 9) {
-  if (counter < 4) {
+  if (counter < 9) {
+  // if (counter < 4) {
     dummyPhoto.business_id = temp;
     counter += 1;
   } else {

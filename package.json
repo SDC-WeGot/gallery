@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server": "nodemon server/index.js",
+    "server": "nodemon server/pindex.js",
     "react-dev": "webpack -d --watch",
     "seed": "node data/seed.js",
     "test": "jest",
-    "start": "node server/index.js",
+    "start": "node server/pindex.js",
     "localtest": "node data/seed.js && node server/index.js"
   },
   "author": "",
