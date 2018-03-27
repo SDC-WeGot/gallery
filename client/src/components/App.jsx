@@ -28,8 +28,8 @@ export default class App extends React.Component {
     const context = this;
     // const id = this.state.currentSite;
     const id = window.location.href.split('/')[4];
-
     axios.get(`/api/restaurants/${id}/gallery`)
+    // axios.get(`/restaurants/${id}/gallery`)
       .then((response) => {
         // console.log(response.data)
         context.setState({

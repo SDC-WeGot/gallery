@@ -6,7 +6,7 @@ const dbt = pgp({
 });
 
 function findOne(id, callback) {
-  console.log('database finding by id:', id);
+  // console.log('database finding by id:', id);
   dbt.any(`SELECT * from businesses INNER JOIN photos ON businesses.id = photos.business_id INNER JOIN users on photos.user_id = users.id WHERE businesses.id = ${id};`, [true])
     .then(function(data) {
       // console.log(data);

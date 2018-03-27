@@ -1,26 +1,38 @@
-const request = require('supertest');
+const newrelic = require('newrelic');
 const express = require('express');
+
+const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
-const pgp = require('pg-promise')();
 const db = require('../database/pindex.js');
+const redis = require('redis');
 
+const client = redis.createClient(6379, '127.0.0.1');
 
+function cache(req, res, next) {
+  const id = req.params.id;
+  client.get(id, (err, data) => {
+    if (err) throw err; 
 
-const app = express();
+    if (data !== null) {
+      res.send(JSON.parse(data));
+    } else {
+      next();
+    }
+  });
+}
 
 app.use(cors());
-
 app.use(bodyParser.json());
 
 app.use('/restaurants/:id', express.static(path.join(__dirname, '../client/dist')));
 
-app.get('/api/restaurants/:id/gallery', (req, res) => {
+app.get('/api/restaurants/:id/gallery', cache, (req, res) => {
   const id = req.params.id;
   console.log('server querying for id: ', id);
   db.findOne(id, (data) => {
-    let fitToFrontEnd = [{
+    const fitToFrontEnd = [{
       photos: [],
       reviews: [],
       place_id: null,
@@ -43,6 +55,7 @@ app.get('/api/restaurants/:id/gallery', (req, res) => {
       });
     });
 
+    client.setex(id, 3600, JSON.stringify(fitToFrontEnd));
     res.json(fitToFrontEnd);
   });
 });
