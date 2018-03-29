@@ -7,26 +7,6 @@ const DIST_DIR = path.join(__dirname, '/client/dist');
 
 const common = {
   context: __dirname + '/client',
-  module: {
-    loaders: [
-      {
-        test: /\.jsx?/,
-        // include: SRC_DIR,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['react', 'es2015', 'stage-0'],
-        },
-      },
-      {
-        test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader'
-        ]
-      },
-    ],
-  },
   plugins: [
     new webpack.DefinePlugin({ // <-- key to reducing React's size
       'process.env': {
@@ -54,7 +34,31 @@ const client = {
   output: {
     path: DIST_DIR,
     filename: 'app.js'
-  }
+  },
+  module: {
+    loaders: [
+      {
+        test: /\.jsx?/,
+        // include: SRC_DIR,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['react', 'es2015', 'stage-0'],
+        },
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+        ],
+      },
+    ],
+    rules: [
+      { test: /\.jsx?$/, use: 'babel-loader' },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+    ],
+  },
 };
 
 const server = {
@@ -64,7 +68,26 @@ const server = {
     path: DIST_DIR ,
     filename: 'app-server.js',
     libraryTarget: 'commonjs-module'
-  }
+  },
+  module: {
+    loaders: [
+      {
+        test: /\.jsx?/,
+        // include: SRC_DIR,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['react', 'es2015', 'stage-0'],
+        },
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'css-loader',
+        ],
+      },
+    ],
+  },
 };
 
 module.exports = [

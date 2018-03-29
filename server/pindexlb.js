@@ -55,10 +55,12 @@ function childProcess() {
   console.log(`Worker ${process.pid} started...`);
 
   app.use('/restaurants/:id', express.static(path.join(__dirname, '../client/dist')));
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+
 
   app.get('/api/restaurants/:id/gallery', cache, (req, res) => {
     const id = req.params.id;
-    // console.log('server querying for id: ', id);
+    console.log('server querying for id: ', id);
     db.findOne(id, (data) => {
       const fitToFrontEnd = [{
         photos: [],
