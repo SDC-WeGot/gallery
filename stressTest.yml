@@ -1,0 +1,14 @@
+config:
+  target: "http://127.0.0.1:3001"
+  phases:
+    - duration: 300
+      arrivalRate: 50
+  processor: './generateRandomData.js'
+scenarios:
+  - flow:
+    - loop:
+      - function: 'generateRandomData'
+      - get:
+          # url: '/restaurants/{{ id }}/'
+          url: '/api/restaurants/{{ id }}/gallery'
+      count: 30

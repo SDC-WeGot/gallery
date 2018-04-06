@@ -32,11 +32,14 @@ app.get('/api/restaurants/:id/gallery', (req, res) => {
     if (err) {
       res.sendStatus(500);
     } else {
+      console.log(data)
+      console.log(data[0].photos)
+      console.log(data[0].reviews)
       res.json(data);
     }
   });
 });
 
-app.listen(3001, () => console.log('Gallery App listening on port 3001!'));
+app.listen(3002, () => console.log('Gallery App listening on port 3002!'));
 
 module.exports = app;
